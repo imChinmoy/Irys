@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.irys.app.feature.chat.ChatScreen
 import com.irys.app.feature.chats.ChatsScreen
 import com.irys.app.feature.emergency.EmergencyScreen
 import com.irys.app.feature.home.HomeScreen
@@ -69,7 +72,8 @@ fun IrysNavGraph(
             HomeScreen(
                 onNavigateToNearby = { navController.navigate(Routes.NEARBY) },
                 onNavigateToChats = { navController.navigate(Routes.CHATS) },
-                onNavigateToEmergency = { navController.navigate(Routes.EMERGENCY) }
+                onNavigateToEmergency = { navController.navigate(Routes.EMERGENCY) },
+                onNavigateToPermissions = { navController.navigate(Routes.PERMISSIONS) }
             )
         }
 
@@ -78,7 +82,22 @@ fun IrysNavGraph(
         }
 
         composable(Routes.CHATS) {
-            ChatsScreen()
+            ChatsScreen(
+                onNavigateToChat = { conversationId ->
+                    navController.navigate(Routes.chat(conversationId))
+                }
+            )
+        }
+
+        composable(
+            route = Routes.CHAT,
+            arguments = listOf(
+                navArgument("conversationId") { type = NavType.StringType }
+            )
+        ) {
+            ChatScreen(
+                onBackClick = { navController.popBackStack() }
+            )
         }
 
         composable(Routes.EMERGENCY) {

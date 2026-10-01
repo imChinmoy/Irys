@@ -1,21 +1,19 @@
 package com.irys.app.feature.permissions
 
-data class PermissionItem(
+import com.irys.app.domain.model.AppPermissionType
+
+data class PermissionItemUiModel(
+    val type: AppPermissionType,
     val title: String,
     val description: String,
-    val isGranted: Boolean = false
+    val isGranted: Boolean = false,
+    val isRequired: Boolean = true
 )
 
 data class PermissionsUiState(
-    val permissions: List<PermissionItem> = listOf(
-        PermissionItem(
-            title = "Nearby Devices (Bluetooth)",
-            description = "Required to discover nearby Irys nodes and establish mesh peer-to-peer connections without Internet."
-        ),
-        PermissionItem(
-            title = "Location (Optional / Legacy)",
-            description = "Required on older Android versions for Bluetooth Low Energy beacon scanning."
-        )
-    ),
-    val allGranted: Boolean = false
+    val permissions: List<PermissionItemUiModel> = emptyList(),
+    val allRequiredGranted: Boolean = false,
+    val isDenied: Boolean = false,
+    val isPermanentlyDenied: Boolean = false,
+    val rationaleMessage: String? = null
 )

@@ -32,4 +32,19 @@ object DatabaseModule {
     fun provideAppSettingDao(database: IrysDatabase): AppSettingDao {
         return database.appSettingDao()
     }
+
+    @Provides
+    fun provideMessageDao(database: IrysDatabase): com.irys.app.core.database.dao.MessageDao {
+        return database.messageDao()
+    }
+
+    @Provides
+    fun provideConversationDao(database: IrysDatabase): com.irys.app.core.database.dao.ConversationDao {
+        return database.conversationDao()
+    }
+
+    @Provides
+    fun providePeerDao(database: IrysDatabase): com.irys.app.core.database.dao.PeerDao {
+        return database.peerDao()
+    }
 }

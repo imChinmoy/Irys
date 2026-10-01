@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.irys.app.core.ui.theme.EmergencyAmber
 import com.irys.app.core.ui.theme.StatusConnecting
 import com.irys.app.core.ui.theme.StatusError
 import com.irys.app.core.ui.theme.StatusOffline
@@ -23,7 +24,8 @@ enum class StatusIndicatorType {
     ONLINE,
     CONNECTING,
     OFFLINE,
-    ERROR
+    ERROR,
+    DEGRADED
 }
 
 @Composable
@@ -37,6 +39,7 @@ fun IrysStatusBadge(
         StatusIndicatorType.CONNECTING -> StatusConnecting
         StatusIndicatorType.OFFLINE -> StatusOffline
         StatusIndicatorType.ERROR -> StatusError
+        StatusIndicatorType.DEGRADED -> EmergencyAmber
     }
 
     Row(

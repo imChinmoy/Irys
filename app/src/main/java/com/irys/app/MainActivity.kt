@@ -49,7 +49,7 @@ fun IrysApp() {
                     currentRoute = currentRoute,
                     onNavigateToRoute = { route ->
                         navController.navigate(route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo(Routes.HOME) {
                                 saveState = true
                             }
                             launchSingleTop = true

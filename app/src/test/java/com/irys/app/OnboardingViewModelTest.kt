@@ -54,16 +54,48 @@ class OnboardingViewModelTest {
         val viewModel = OnboardingViewModel(useCase, testDispatcher)
 
         assertEquals(0, viewModel.uiState.first().currentStepIndex)
+        val totalSteps = viewModel.uiState.first().steps.size
+        assertEquals(5, totalSteps)
+
+        for (i in 1 until totalSteps) {
+            viewModel.nextStep()
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(i, viewModel.uiState.first().currentStepIndex)
+        }
+
+        viewModel.nextStep()
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(viewModel.uiState.first().isCompleted)
+        assertTrue(repo.completed)
+    }
+
+    @Test
+    fun onboardingViewModel_backStep() = runTest(testDispatcher) {
+        val repo = FakeAppSettingsRepository()
+        val useCase = SetOnboardingCompletedUseCase(repo)
+        val viewModel = OnboardingViewModel(useCase, testDispatcher)
 
         viewModel.nextStep()
         testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(1, viewModel.uiState.first().currentStepIndex)
 
-        viewModel.nextStep()
+        viewModel.previousStep()
         testDispatcher.scheduler.advanceUntilIdle()
-        assertEquals(2, viewModel.uiState.first().currentStepIndex)
+        assertEquals(0, viewModel.uiState.first().currentStepIndex)
 
-        viewModel.nextStep()
+        // Cannot go below 0
+        viewModel.previousStep()
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals(0, viewModel.uiState.first().currentStepIndex)
+    }
+
+    @Test
+    fun onboardingViewModel_skip() = runTest(testDispatcher) {
+        val repo = FakeAppSettingsRepository()
+        val useCase = SetOnboardingCompletedUseCase(repo)
+        val viewModel = OnboardingViewModel(useCase, testDispatcher)
+
+        viewModel.skipOnboarding()
         testDispatcher.scheduler.advanceUntilIdle()
         assertTrue(viewModel.uiState.first().isCompleted)
         assertTrue(repo.completed)

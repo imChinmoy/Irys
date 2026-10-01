@@ -31,6 +31,17 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    fun previousStep() {
+        val prevIndex = _uiState.value.currentStepIndex - 1
+        if (prevIndex >= 0) {
+            _uiState.update { it.copy(currentStepIndex = prevIndex) }
+        }
+    }
+
+    fun skipOnboarding() {
+        completeOnboarding()
+    }
+
     fun completeOnboarding() {
         viewModelScope.launch(ioDispatcher) {
             setOnboardingCompletedUseCase(completed = true)

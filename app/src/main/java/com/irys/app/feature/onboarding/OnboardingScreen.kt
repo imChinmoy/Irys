@@ -1,5 +1,11 @@
 package com.irys.app.feature.onboarding
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,16 +20,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
+import androidx.compose.material.icons.filled.CellTower
 import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.irys.app.core.ui.components.IrysButton
@@ -44,6 +56,16 @@ fun OnboardingScreen(
     }
 
     val currentStep = uiState.steps.getOrNull(uiState.currentStepIndex) ?: return
+    val isLastStep = uiState.currentStepIndex == uiState.steps.size - 1
+
+    val stepIcon: ImageVector = when (uiState.currentStepIndex) {
+        0 -> Icons.Default.CellTower
+        1 -> Icons.Default.WifiOff
+        2 -> Icons.Default.Hub
+        3 -> Icons.Default.Lock
+        4 -> Icons.AutoMirrored.Filled.BluetoothSearching
+        else -> Icons.Default.CellTower
+    }
 
     Column(
         modifier = Modifier
@@ -53,37 +75,101 @@ fun OnboardingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+        // Top Bar: Step counter and Skip
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Hub,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(80.dp)
+            Text(
+                text = "STEP ${uiState.currentStepIndex + 1} OF ${uiState.steps.size}",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(32.dp))
 
-            IrysCard(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = currentStep.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = currentStep.description,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            if (!isLastStep) {
+                TextButton(onClick = { viewModel.skipOnboarding() }) {
+                    Text(
+                        text = "Skip",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.width(48.dp))
+            }
+        }
+
+        // Center Content with Animated Transition
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            AnimatedContent(
+                targetState = uiState.currentStepIndex,
+                transitionSpec = {
+                    if (targetState > initialState) {
+                        (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
+                            slideOutHorizontally { width -> -width } + fadeOut()
+                        )
+                    } else {
+                        (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
+                            slideOutHorizontally { width -> width } + fadeOut()
+                        )
+                    }
+                },
+                label = "OnboardingContentTransition"
+            ) { index ->
+                val step = uiState.steps[index]
+                val icon = when (index) {
+                    0 -> Icons.Default.CellTower
+                    1 -> Icons.Default.WifiOff
+                    2 -> Icons.Default.Hub
+                    3 -> Icons.Default.Lock
+                    4 -> Icons.AutoMirrored.Filled.BluetoothSearching
+                    else -> Icons.Default.CellTower
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(88.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(36.dp))
+
+                    IrysCard(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = step.subtitle.uppercase(),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = step.title,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Text(
+                            text = step.description,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
+            // Indicator Dots
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -92,7 +178,7 @@ fun OnboardingScreen(
                     val isSelected = index == uiState.currentStepIndex
                     Box(
                         modifier = Modifier
-                            .size(if (isSelected) 10.dp else 8.dp)
+                            .size(if (isSelected) 10.dp else 7.dp)
                             .background(
                                 color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                                 shape = CircleShape
@@ -105,14 +191,28 @@ fun OnboardingScreen(
             }
         }
 
+        // Bottom Controls
         Column(modifier = Modifier.fillMaxWidth()) {
-            val isLastStep = uiState.currentStepIndex == uiState.steps.size - 1
-            IrysButton(
-                text = if (isLastStep) "Get Started" else "Next",
-                onClick = { viewModel.nextStep() },
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                style = IrysButtonStyle.PRIMARY
-            )
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if (uiState.currentStepIndex > 0) {
+                    IrysButton(
+                        text = "Back",
+                        onClick = { viewModel.previousStep() },
+                        modifier = Modifier.weight(1f),
+                        style = IrysButtonStyle.SECONDARY
+                    )
+                }
+
+                IrysButton(
+                    text = if (isLastStep) "Get Started" else "Next",
+                    onClick = { viewModel.nextStep() },
+                    modifier = Modifier.weight(if (uiState.currentStepIndex > 0) 2f else 1f),
+                    style = IrysButtonStyle.PRIMARY
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
