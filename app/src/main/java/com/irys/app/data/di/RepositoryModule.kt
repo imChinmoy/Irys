@@ -49,4 +49,10 @@ abstract class RepositoryModule {
     abstract fun bindPeerRepository(
         impl: PeerRepositoryImpl
     ): PeerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBleDiscoveryRepository(
+        impl: com.irys.app.data.repo.BleDiscoveryRepositoryImpl
+    ): com.irys.app.domain.repo.BleDiscoveryRepository
 }

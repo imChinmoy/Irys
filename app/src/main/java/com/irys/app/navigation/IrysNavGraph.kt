@@ -78,7 +78,11 @@ fun IrysNavGraph(
         }
 
         composable(Routes.NEARBY) {
-            NearbyScreen()
+            NearbyScreen(
+                onNavigateToChat = { conversationId ->
+                    navController.navigate(Routes.chat(conversationId))
+                }
+            )
         }
 
         composable(Routes.CHATS) {

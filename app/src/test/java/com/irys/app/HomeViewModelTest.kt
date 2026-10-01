@@ -6,6 +6,7 @@ import com.irys.app.domain.model.Message
 import com.irys.app.domain.model.MessagePriority
 import com.irys.app.domain.model.MessageStatus
 import com.irys.app.domain.model.Peer
+import com.irys.app.domain.model.PeerConnectionStatus
 import com.irys.app.domain.model.PermissionStatus
 import com.irys.app.domain.repo.AppSettingsRepository
 import com.irys.app.domain.repo.ConversationRepository
@@ -88,6 +89,9 @@ class HomeViewModelTest {
         override suspend fun savePeer(peer: Peer) {}
         override fun getPeerCount(): Flow<Int> = MutableStateFlow(2)
         override suspend fun deletePeer(nodeId: String) {}
+        override suspend fun updatePeerRssi(nodeId: String, rssi: Int, lastSeenTimestamp: Long) {}
+        override suspend fun updatePeerConnectionStatus(nodeId: String, status: PeerConnectionStatus) {}
+        override suspend fun removeStalePeers(olderThanTimestamp: Long) {}
     }
 
     @Before

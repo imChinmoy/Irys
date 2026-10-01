@@ -18,7 +18,7 @@ import com.irys.app.core.database.entity.PeerEntity
         ConversationEntity::class,
         PeerEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class IrysDatabase : RoomDatabase() {
